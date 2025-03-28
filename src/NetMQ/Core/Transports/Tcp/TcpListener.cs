@@ -22,7 +22,7 @@
 using System;
 using System.Diagnostics;
 using System.Net.Sockets;
-#if NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET6_0_OR_GREATER
 using System.Runtime.InteropServices;
 #endif
 using AsyncIO;
@@ -141,7 +141,7 @@ namespace NetMQ.Core.Transports.Tcp
                     }
                 }
 
-#if NETSTANDARD2_0 || NETSTANDARD2_1
+#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET6_0_OR_GREATER
                 // This command is failing on linux
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     m_handle.ExclusiveAddressUse = false;
@@ -204,18 +204,10 @@ namespace NetMQ.Core.Transports.Tcp
                     {
                         acceptedSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, m_options.TcpKeepalive);
 
-                        if (m_options.TcpKeepaliveIdle != -1 && m_options.TcpKeepaliveIntvl != -1)
-                        {
-                            var bytes = new ByteArraySegment(new byte[12]);
-
-                            Endianness endian = BitConverter.IsLittleEndian ? Endianness.Little : Endianness.Big;
-
-                            bytes.PutInteger(endian, m_options.TcpKeepalive, 0);
-                            bytes.PutInteger(endian, m_options.TcpKeepaliveIdle, 4);
-                            bytes.PutInteger(endian, m_options.TcpKeepaliveIntvl, 8);
-
-                            acceptedSocket.IOControl(IOControlCode.KeepAliveValues, (byte[])bytes, null);
-                        }
+                        if (m_options.TcpKeepaliveIdle != -1)
+                            acceptedSocket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, m_options.TcpKeepaliveIdle / 1000);
+                        if (m_options.TcpKeepaliveIntvl != -1)
+                            acceptedSocket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, m_options.TcpKeepaliveIntvl / 1000);
                     }
 
                     // Create the engine object for this connection.

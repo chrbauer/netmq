@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET47
+﻿#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET6_0_OR_GREATER || NET47
 
 using System;
 using System.Collections.Generic;
