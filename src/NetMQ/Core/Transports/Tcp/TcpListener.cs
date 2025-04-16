@@ -208,6 +208,9 @@ namespace NetMQ.Core.Transports.Tcp
                             acceptedSocket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, m_options.TcpKeepaliveIdle / 1000);
                         if (m_options.TcpKeepaliveIntvl != -1)
                             acceptedSocket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, m_options.TcpKeepaliveIntvl / 1000);
+
+                        if (m_options.TcpKeepaliveCnt != -1)
+                            acceptedSocket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, m_options.TcpKeepaliveCnt);
                     }
 
                     // Create the engine object for this connection.
